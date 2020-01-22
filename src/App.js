@@ -1,30 +1,36 @@
 import React, { Component } from 'react'
-import Contacts from './components/contacts'
+import Home from 'components/home/home'
+import Navbar from 'components/common/navbar/Navbar'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import ScrollToTop from 'react-router-scroll-top'
+import GlobalStyles from 'global/style'
+
 class App extends Component {
   state = {
-    contacts: []
+    navbarOpen: false
   }
 
-  componentDidMount() {
-    fetch(
-      'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/shyuki',
-      {
-        method: 'GET',
-        headers: {
-          'X-Riot-Token': process.env.RIOT_LOL_API_KEY
-        }
-      }
-    )
-      .then(res => res.json())
-      .then(data => {
-        this.setState({ contacts: data })
-        console.log(this.state)
-      })
-      .catch(console.log)
+  handleNavbar = () => {
+    this.setState({ navbarOpen: !this.state.navbarOpen })
   }
 
   render() {
-    return <Contacts contacts={this.state.contacts} />
+    return (
+      <Router>
+        <ScrollToTop>
+          <Navbar
+            navbarState={this.state.navbarOpen}
+            handleNavbar={this.handleNavbar}
+          />
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route path="/ranking" />
+            <Route path="/about" />
+          </Switch>
+        </ScrollToTop>
+        <GlobalStyles />
+      </Router>
+    )
   }
 }
 
