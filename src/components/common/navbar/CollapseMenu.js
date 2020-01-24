@@ -42,7 +42,6 @@ const CollapseMenu = props => {
             </NavLink>
           </li>
         </NavLinks>
-        <Hr />
       </CollapseWrapper>
     )
   }
@@ -51,22 +50,19 @@ const CollapseMenu = props => {
 
 export default CollapseMenu
 
-const Hr = styled.hr`
-  width: 100%;
-  margin: 0 auto;
-`
-
 const CollapseWrapper = styled(animated.div)`
   background: #fff;
   position: fixed;
-  top: 5rem;
+  top: 0rem;
   left: 0;
   right: 0;
+  height: 200px;
 `
 
 const NavLinks = styled.ul`
   list-style-type: none;
   padding: 2rem 1rem 2rem 2rem;
+  margin-top: 3rem;
 
   & li {
     transition: all 500ms linear 0s;
