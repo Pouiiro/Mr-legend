@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 
 const GlobalStyles = createGlobalStyle`
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Poppins|Roboto|Roboto+Condensed|Roboto+Mono&display=swap');
 html {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;

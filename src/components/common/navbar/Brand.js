@@ -18,7 +18,7 @@ const Brand = () => {
 export default Brand
 
 const Link = styled.a`
-  width: 10%;
+  width: 15%;
   height: auto;
   margin: auto 0;
   @media only screen and (max-width: 600px) {
@@ -30,6 +30,6 @@ const Link = styled.a`
 const Image = styled.img`
   width: 100%;
   @media only screen and (max-width: 600px) {
-    width: 100%;
+    width: 120%;
   }
 `
