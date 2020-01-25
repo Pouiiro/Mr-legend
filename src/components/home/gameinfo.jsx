@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
+import { MrLegendContext } from 'providers/appProvider'
+
 import styled from 'styled-components'
 import { Parallax } from 'react-parallax'
 import bg2 from 'assets/images/bg2.jpg'
@@ -16,7 +18,8 @@ import {
   CardBody
 } from 'shards-react'
 
-const GInfo = ({ state }) => {
+const GInfo = () => {
+  const { state } = useContext(MrLegendContext)
   const qii = state.gameData.map(value => value.incidents)
   for (let index = 0; index < qii.length; index++) {
     let element = qii[index]
@@ -50,7 +53,6 @@ const GInfo = ({ state }) => {
             >
               {element.status}
             </Ctitle>
-
             {element.incidents}
           </Cbody>
         </Cardu>

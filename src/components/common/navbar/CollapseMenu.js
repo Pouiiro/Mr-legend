@@ -3,18 +3,18 @@ import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { useSpring, animated } from 'react-spring'
 
-const CollapseMenu = props => {
-  const { open } = useSpring({ open: props.navbarState ? 0 : 1 })
+const CollapseMenu = ({ navbarState, handleNavbar }) => {
+  const { open } = useSpring({ open: navbarState ? 0 : 1 })
   const styleAc = {
     color: '#000000',
     fontSize: '1rem',
     lineHeight: '2',
     fontWeight: '600'
   }
-  if (props.navbarState === true) {
+  if (navbarState === true) {
     return (
       <CollapseWrapper
-        onClick={props.handleNavbar}
+        onClick={handleNavbar}
         style={{
           transform: open
             .interpolate({

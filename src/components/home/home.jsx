@@ -5,12 +5,12 @@ import Cinfo from './champsinfo'
 import { ContainerS } from 'global/styles'
 import 'global/btn.css'
 
-const Home = ({ state, getUserdata, inputUser }) => {
+const Home = () => {
   return (
     <ContainerS>
-      <Intro getUserdata={getUserdata} inputUser={inputUser} state={state} />
-      <GInfo state={state} />
-      <Cinfo state={state} />
+      <Intro />
+      <GInfo />
+      <Cinfo />
     </ContainerS>
   )
 }

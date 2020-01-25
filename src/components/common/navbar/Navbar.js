@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import styled from 'styled-components'
 import { useSpring, animated, config } from 'react-spring'
 import { NavLink } from 'react-router-dom'
@@ -7,10 +7,7 @@ import BurgerMenu from './BurgerMenu'
 import CollapseMenu from './CollapseMenu'
 
 export const useScrollHandler = () => {
-  // setting initial value to true
   const [scroll, setScroll] = useState(true)
-
-  // running on mount
   useEffect(() => {
     const onScroll = () => {
       const scrollCheck = window.scrollY < 10
@@ -18,11 +15,7 @@ export const useScrollHandler = () => {
         setScroll(scrollCheck)
       }
     }
-
-    // setting the event handler from web API
     document.addEventListener('scroll', onScroll)
-
-    // cleaning up from the web API
     return () => {
       document.removeEventListener('scroll', onScroll)
     }
@@ -31,21 +24,29 @@ export const useScrollHandler = () => {
   return scroll
 }
 
-const Navbar = props => {
+const Navbar = () => {
   const scroll = useScrollHandler()
-  // const barAnimation = useSpring(
-  //   scroll === true
-  //     ? {
-  //         from: { transform: 'translate3d(0, -10rem, 0)' },
-  //         transform: 'translate3d(0, 0, 0)',
-  //         backgroundColor: '#0000'
-  //       }
-  //     : {
-  //         from: { transform: 'translate3d(0, -10rem, 0)' },
-  //         transform: 'translate3d(0, 0, 0)',
-  //         backgroundColor: 'white'
-  //       }
-  // )
+  const [nav, setNav] = useState(false)
+
+  const owo = () => {
+    setNav(!nav)
+  }
+
+  const barAnimation = useSpring(
+    scroll === true
+      ? {
+          from: { transform: 'translate3d(0, -10rem, 0)' },
+          transform: 'translate3d(0, 0, 0)',
+          backgroundColor: '#0000',
+          transition: '0.1s ease in'
+        }
+      : {
+          from: { transform: 'translate3d(0, -10rem, 0)' },
+          transform: 'translate3d(0, 0, 0)',
+          backgroundColor: 'white',
+          transition: '0.1s ease in'
+        }
+  )
 
   const linkAnimation = useSpring({
     from: { transform: 'translate3d(0, 30px, 0)', opacity: 0 },
@@ -57,21 +58,15 @@ const Navbar = props => {
 
   return (
     <>
-      <NavBar
-        style={
-          scroll === true
-            ? {
-                backgroundColor: '#0000',
-                transition: '0.5s ease'
-              }
-            : { backgroundColor: 'white', transition: '0.5s ease' }
-        }
-      >
+      <NavBar style={barAnimation}>
         <FlexContainer>
           <Brand />
           <NavLinks style={linkAnimation}>
             <NavLink activeStyle={styleAc} to="/" exact>
               Home
+            </NavLink>
+            <NavLink activeStyle={styleAc} to="/profile" exact>
+              Profile
             </NavLink>
             <NavLink activeStyle={styleAc} to="/ranking" exact>
               Ranking
@@ -82,17 +77,11 @@ const Navbar = props => {
             </NavLink>
           </NavLinks>
           <BurgerWrapper>
-            <BurgerMenu
-              navbarState={props.navbarState}
-              handleNavbar={props.handleNavbar}
-            />
+            <BurgerMenu navbarState={nav} handleNavbar={owo} />
           </BurgerWrapper>
         </FlexContainer>
       </NavBar>
-      <CollapseMenu
-        navbarState={props.navbarState}
-        handleNavbar={props.handleNavbar}
-      />
+      <CollapseMenu navbarState={nav} handleNavbar={owo} />
     </>
   )
 }
@@ -141,7 +130,7 @@ const NavLinks = styled(animated.ul)`
     text-transform: uppercase;
     border-bottom: 1px solid transparent;
     margin: 0 1.2rem;
-    transition: all 200ms linear 0s;
+    transition: 200ms linear 0s;
     text-decoration: none;
     cursor: pointer;
 

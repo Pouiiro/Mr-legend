@@ -1,20 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import styled from 'styled-components'
 import { Parallax } from 'react-parallax'
 import bg3 from 'assets/images/bg3.jpg'
 import { Div2, Title1 } from 'global/styles'
 import 'global/btn.css'
 import { Container, Row, Col, Card, CardHeader, CardImg } from 'shards-react'
+import { MrLegendContext } from 'providers/appProvider'
 
-const Cinfo = ({ state }) => {
+const Cinfo = () => {
+  const { state } = useContext(MrLegendContext)
   const rotation = state.rotationChamps
   const champs = state.champData
   const frir = rotation.map(element => {
-    const obj = champs.find(obj => obj.key === element)
+    const obj = champs.find(obj => obj.key === element.toString())
     return (
-      <Col>
+      <Col key={obj.key}>
         <Cardu
-          key={obj.key}
           style={{
             maxWidth: '300px',
             backgroundColor: '#0000',
