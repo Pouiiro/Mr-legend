@@ -4,22 +4,24 @@ import champion from 'data/champion'
 
 export const MrLegendContext = createContext()
 
+const defaultData = {
+  playerData: [],
+  gameData: [
+    { name: 'Game', status: 'N/A', incidents: 'Riot API not responding' },
+    { name: 'Store', status: 'N/A', incidents: 'Riot API not responding' },
+    {
+      name: 'Website',
+      status: 'N/A',
+      incidents: 'Riot API not responding'
+    },
+    { name: 'Client', status: 'N/A', incidents: 'Riot API not responding' }
+  ],
+  champData: [],
+  rotationChamps: []
+}
+
 export default ({ children }) => {
-  const defaultData = {
-    playerData: [],
-    gameData: [
-      { name: 'Game', status: 'N/A', incidents: 'Riot API not responding' },
-      { name: 'Store', status: 'N/A', incidents: 'Riot API not responding' },
-      {
-        name: 'Website',
-        status: 'N/A',
-        incidents: 'Riot API not responding'
-      },
-      { name: 'Client', status: 'N/A', incidents: 'Riot API not responding' }
-    ],
-    champData: [],
-    rotationChamps: []
-  }
+  const [loading, setLoading] = useState(true)
   const [user, setUser] = useState({ currentUser: '' })
   const [state, setState] = useState(defaultData)
 
@@ -41,6 +43,7 @@ export default ({ children }) => {
         gameData: result.data[1],
         rotationChamps: result.data[2]
       })
+      setLoading(false)
     }
     fetchData()
   }, [user, state, useState])
@@ -54,7 +57,7 @@ export default ({ children }) => {
         setUser
       }}
     >
-      {children}
+      {loading ? <p>loading</p> : children}
     </MrLegendContext.Provider>
   )
 }

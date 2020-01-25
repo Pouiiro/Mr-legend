@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { Parallax } from 'react-parallax'
-import { MrLegendContext } from 'providers/appProvider'
+import { MrLegendContext } from 'providers/AppProvider'
 import {
   Div,
   Div1,

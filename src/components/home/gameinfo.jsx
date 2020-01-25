@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react'
-import { MrLegendContext } from 'providers/appProvider'
+import { MrLegendContext } from 'providers/AppProvider'
 
 import styled from 'styled-components'
 import { Parallax } from 'react-parallax'

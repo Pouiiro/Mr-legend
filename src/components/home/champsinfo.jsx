@@ -1,16 +1,17 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { Parallax } from 'react-parallax'
 import bg3 from 'assets/images/bg3.jpg'
 import { Div2, Title1 } from 'global/styles'
 import 'global/btn.css'
 import { Container, Row, Col, Card, CardHeader, CardImg } from 'shards-react'
-import { MrLegendContext } from 'providers/appProvider'
+import { MrLegendContext } from 'providers/AppProvider'
 
 const Cinfo = () => {
   const { state } = useContext(MrLegendContext)
   const rotation = state.rotationChamps
   const champs = state.champData
+
   const frir = rotation.map(element => {
     const obj = champs.find(obj => obj.key === element.toString())
     return (
@@ -30,6 +31,7 @@ const Cinfo = () => {
       </Col>
     )
   })
+
   return (
     <Parallax blur={0} bgImage={bg3} bgImageAlt="league scenery" strength={200}>
       <Div2>
