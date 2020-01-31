@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 export const ContainerS = styled.div`
   margin: 0;
@@ -109,7 +110,7 @@ export const ButtonD = styled.div`
   margin: 0 auto;
 `
 
-export const ButtonS = styled.a`
+export const ButtonS = styled(Link)`
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: 600;
 `

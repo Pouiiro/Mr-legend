@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import logo from 'assets/images/cover.png'
 import logo1 from 'assets/images/cover2.png'
+
 const Brand = () => {
   return (
     <Link href="#">

@@ -9,6 +9,7 @@ import { MrLegendContext } from 'providers/AppProvider'
 
 const Cinfo = () => {
   const { state } = useContext(MrLegendContext)
+
   const rotation = state.rotationChamps
   const champs = state.champData
 

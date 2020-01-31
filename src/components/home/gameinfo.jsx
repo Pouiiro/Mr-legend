@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useContext } from 'react'
 import { MrLegendContext } from 'providers/AppProvider'
 
 import styled from 'styled-components'
@@ -20,18 +20,14 @@ import {
 
 const GInfo = () => {
   const { state } = useContext(MrLegendContext)
-  const qii = state.gameData.map(value => value.incidents)
-  for (let index = 0; index < qii.length; index++) {
-    let element = qii[index]
-    if (Array.isArray(element) && element.length) {
-      const geCont = element.map(value => value.updates.map(x => x.content))
-      element.splice(0, element.length, ...geCont)
-    } else if (Array.isArray(element)) {
-      element.push('No Notifications | All Good')
-    }
-  }
+  let owoish
 
   const rend = state.gameData.map((element, index) => {
+    if (Array.isArray(element.incidents) && element.incidents.length) {
+      owoish = false
+    } else {
+      owoish = true
+    }
     return (
       <Col key={index}>
         <Cardu
@@ -53,7 +49,11 @@ const GInfo = () => {
             >
               {element.status}
             </Ctitle>
-            {element.incidents}
+            {owoish
+              ? 'No Notifications | All Good'
+              : element.incidents.map(value =>
+                  value.updates.map(x => <p key={x.id}>{x.content}</p>)
+                )}
           </Cbody>
         </Cardu>
       </Col>
@@ -96,7 +96,7 @@ const Cbody = styled(CardBody)`
 
 const Cimg = styled(CardImg)`
   width: 300px;
-  height: 160px;
+  height: 180px;
   margin-left: auto;
   margin-right: auto;
   border: 5px black solid;

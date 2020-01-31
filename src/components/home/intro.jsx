@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useContext } from 'react'
 import { Parallax } from 'react-parallax'
 import { MrLegendContext } from 'providers/AppProvider'
 import {
@@ -16,11 +16,12 @@ import logo from 'assets/images/cover3.png'
 import bg1 from 'assets/images/bg1.jpg'
 
 const Intro = () => {
-  const { user, setUser } = useContext(MrLegendContext)
+  const { state, setUser } = useContext(MrLegendContext)
   let summoner = ''
   const inputUser = () => {
-    setUser({ ...user, currentUser: summoner })
+    setUser(summoner)
   }
+
   return (
     <Parallax bgImage={bg1} strength={500}>
       <Div style={{ height: '720px' }}>
@@ -30,17 +31,14 @@ const Intro = () => {
           </Title>
           <Input
             onChange={e => {
-              user = e.target.value
+              summoner = e.target.value
             }}
             type="text"
             placeholder="SUMMONER NAME"
           />
-          <ButtonD>
+          <ButtonD onClick={inputUser}>
             <ButtonS
-              onClick={e => {
-                e.preventDefault()
-                inputUser()
-              }}
+              to="/profile"
               className="btn btn-white btn-				 animate"
               href=""
             >

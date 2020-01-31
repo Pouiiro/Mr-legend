@@ -6,6 +6,7 @@ html {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
+
   }
 
   body {
@@ -13,6 +14,7 @@ html {
     overflow: scroll;
     overflow-x: hidden; 
     background-color: #fff !important;
+  
   ::-webkit-scrollbar {
     width: 0px;  /* Remove scrollbar space */
     background: transparent;  /* Optional: just make scrollbar invisible */
