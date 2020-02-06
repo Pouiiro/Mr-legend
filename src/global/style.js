@@ -2,19 +2,18 @@ import { createGlobalStyle } from 'styled-components'
 
 const GlobalStyles = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css?family=Poppins|Roboto|Roboto+Condensed|Roboto+Mono&display=swap');
-html {
+html,body {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
-
+    height:100%;
+    margin: 0;
   }
-
   body {
     margin: 0;
     overflow: scroll;
     overflow-x: hidden; 
     background-color: #fff !important;
-  
   ::-webkit-scrollbar {
     width: 0px;  /* Remove scrollbar space */
     background: transparent;  /* Optional: just make scrollbar invisible */

@@ -16,7 +16,7 @@ export default () => {
 
   const getCharacter = useCallback(async () => {
     try {
-      const { data } = await axios.get(`http://localhost:3001/lol`)
+      const { data } = await axios.get(`http://127.0.0.1:3000/status`)
       setState({
         ...state,
         gameData: data[0],

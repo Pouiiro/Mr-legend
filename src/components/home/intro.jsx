@@ -16,11 +16,8 @@ import logo from 'assets/images/cover3.png'
 import bg1 from 'assets/images/bg1.jpg'
 
 const Intro = () => {
-  const { state, setUser } = useContext(MrLegendContext)
+  const { setUser } = useContext(MrLegendContext)
   let summoner = ''
-  const inputUser = () => {
-    setUser(summoner)
-  }
 
   return (
     <Parallax bgImage={bg1} strength={500}>
@@ -36,12 +33,8 @@ const Intro = () => {
             type="text"
             placeholder="SUMMONER NAME"
           />
-          <ButtonD onClick={inputUser}>
-            <ButtonS
-              to="/profile"
-              className="btn btn-white btn-				 animate"
-              href=""
-            >
+          <ButtonD onClick={() => setUser(summoner)}>
+            <ButtonS to="/profile" className="btn btn-white btn-				 animate">
               Let's Go
             </ButtonS>
           </ButtonD>

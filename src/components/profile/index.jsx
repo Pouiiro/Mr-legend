@@ -2,49 +2,62 @@ import React, { useEffect, useContext, useCallback, useState } from 'react'
 import axios from 'axios'
 import moment from 'moment'
 import { MrLegendContext } from 'providers/AppProvider'
-
 import ReactCardCarousel from 'react-card-carousel'
-import { ContainerS } from 'global/styles'
 import styled from 'styled-components'
-import FadeIn from 'react-fade-in'
 import Loading from '../loading/Loading'
 import more from '../../assets/images/more.png'
-import './temp.css'
+import { Div } from 'global/styles'
 import {
+  Container,
   Row,
   Col,
   Card,
   CardHeader,
   CardTitle,
-  CardImg,
   CardBody,
   CardFooter
 } from 'shards-react'
 
+var s = 0
+var e = 5
+
 export default () => {
   const [loadingS, setLoadingS] = useState(true)
   const [moreC, setMore] = useState(6)
-  const { setDark, state, user, setState } = useContext(MrLegendContext)
+  const { state, user, setState } = useContext(MrLegendContext)
+  const [sRank, setRank] = useState(0)
+  const [gamesu, setGamsu] = useState(false)
+  const [miniLoad, setMiniLoad] = useState(false)
+
+  const Arrow = ({ text, className }) => {
+    return <div className={className}>{text}</div>
+  }
 
   const champs = state.champData
   const getCharacter = useCallback(async () => {
     try {
-      const { data } = await axios.get(
-        `http://localhost:3001/summoner?name=${user}`
-      )
+      const summoner = await axios
+        .get(`http://127.0.0.1:3000/summoner?name=${user}`)
+        .then(results => results.data)
+      const sumdata = await axios
+        .all([
+          axios.get(`http://127.0.0.1:3000/rank?id=${summoner.id}`),
+          axios.get(`http://127.0.0.1:3000/mastery?id=${summoner.id}`),
+          axios.get(
+            `http://127.0.0.1:3000/matches?id=${summoner.accountId}&s=0&e=5`
+          )
+        ])
+        .then(resArr => [resArr[0].data, resArr[1].data, resArr[2].data])
       setState(prevState => ({
         ...state,
         SummonerData: {
-          playerData: data[0],
-          rankData: data[2],
-          champData: data[1],
-          matchH: data[3],
-          matchHs: data[4]
+          playerData: summoner,
+          rankData: sumdata[0],
+          champData: sumdata[1],
+          matchH: sumdata[2]
         }
       }))
-
       setLoadingS(false)
-      setDark(true)
     } catch (err) {
       console.log(err)
     }
@@ -54,16 +67,31 @@ export default () => {
     getCharacter()
   }, [getCharacter])
 
-  const matchH = state.SummonerData.matchH
-  const sMatch = state.SummonerData.matchHs
+  const moreChampsu = async () => {
+    console.log({ s: s, e: e })
+    s = s + 5
+    e = e + 5
+    await axios
+      .get(
+        `http://127.0.0.1:3000/matches?id=${state.SummonerData.playerData.accountId}&s=${s}&e=${e}`
+      )
+      .then(val => {
+        val.data.map(x => state.SummonerData.matchH.push(x))
+        setGamsu(true)
+      })
+    setGamsu(false)
+    console.log({ s: s, e: e })
+  }
+  let arrParti = []
 
-  const arrParti = []
-  const wiwi = sMatch.map(function(ind) {
-    const iwi = ind.map(owo => owo.player.summonerId)
-    const uwu = ind.map(x => x.participantId)
+  const matchH = state.SummonerData.matchH
+
+  const wiwi = matchH.map(ind => {
+    const iwi = ind.participantIdentities.map(owo => owo.player.summonerId)
+    const uwu = ind.participantIdentities.map(x => x.participantId)
     const num1 = uwu
     const num2 = iwi
-    num1.forEach(function(v, i) {
+    num1.forEach((v, i) => {
       const obj = []
       obj.participantId = v
       obj.summonerId = num2[i]
@@ -76,79 +104,49 @@ export default () => {
     return ss
   })
 
-  const partic = matchH.map(x => x.participants)
-  const filteredParti = []
-  const awi = partic.forEach((element, i) => {
-    const owo = element.find(x => x.participantId === pId[i].participantId)
-    filteredParti.push(owo)
-  })
-
-  const hesus = filteredParti.map(ex => {
-    const bData = {
-      champ: ex.championId,
-      sum1: ex.spell1Id,
-      sum2: ex.spell2Id,
-      win: ex.stats.win,
-      k: ex.stats.kills,
-      d: ex.stats.deaths,
-      a: ex.stats.assists,
-      cs: ex.stats.totalMinionsKilled
-    }
-    return bData
-  })
-
-  const wholeData = hesus.map(xs => {
-    const obj = champs.find(x => x.key === xs.champ.toString())
-    return { name: obj.id, ...xs }
-  })
-  const printData = wholeData.map((xxx, i) => {
-    const bgWin = {
-      backgroundImage: `linear-gradient(rgba(0, 255, 76, 0.2), rgba(0, 255, 76, 0.2)),url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${xxx.name}_1.jpg)`
-    }
-    const bgLose = {
-      backgroundImage: `linear-gradient(rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.2)),url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${xxx.name}_1.jpg)`
-    }
-    return (
-      <Col xl key={i}>
-        <MyCard style={xxx.win ? bgWin : bgLose}>
-          <MyCardImg
-            src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/champion/${xxx.name}.png`}
-          />
-          <MyCardH1> {xxx.win ? 'Victory' : 'Defeat'}</MyCardH1>
-          <MyCardLast>
-            <MyCardLastOne>
-              <h4>{xxx.cs} Cs/Minute</h4>
-              <h4>KDA {`${xxx.k}/${xxx.d}/${xxx.a}`}</h4>
-            </MyCardLastOne>
-            <MyCardLastTwo></MyCardLastTwo>
-          </MyCardLast>
-        </MyCard>
-      </Col>
+  const matchHistory = matchH.map((element, i) => {
+    const participantStats = element.participants.find(
+      x => x.participantId === pId[i].participantId
     )
+    const filteredTeam = element.teams.find(
+      x => x.teamId === participantStats.teamId
+    )
+    const newMatch = {
+      date: element.gameCreation,
+      duration: element.gameDuration,
+      mode: element.gameMode,
+      type: element.gameType,
+      pStat: participantStats,
+      team: filteredTeam
+    }
+    return newMatch
+  })
+
+  const matchHistoryChamp = matchHistory.map(element => {
+    const obj = champs.find(x => x.key === element.pStat.championId.toString())
+    return { name: obj.id, ...element }
   })
   const rank = state.SummonerData.rankData.map(data => {
-    let tier = []
-    let tierN = []
-    let lp = []
-    let wins = []
-    let loses = []
-    let type = []
-    let wr = []
-    tier = data.tier
-    tierN = data.rank
-    lp = data.leaguePoints
-    wins = data.wins
-    loses = data.losses
-    type = data.queueType
-    wr = (wins / (wins + loses)) * 100
-    return {
-      tier: tier,
-      rank: tierN,
-      lp: lp,
-      wins: wins,
-      losses: loses,
-      qType: type,
-      wr: wr
+    if (data.queueType === 'RANKED_FLEX_SR') {
+      return {
+        tier: data.tier,
+        rank: data.rank,
+        lp: data.leaguePoints,
+        wins: data.wins,
+        losses: data.losses,
+        qType: 'Flex 5/5',
+        wr: (data.wins / (data.wins + data.losses)) * 100
+      }
+    } else {
+      return {
+        tier: data.tier,
+        rank: data.rank,
+        lp: data.leaguePoints,
+        wins: data.wins,
+        losses: data.losses,
+        qType: 'Solo / Duo',
+        wr: (data.wins / (data.wins + data.losses)) * 100
+      }
     }
   })
 
@@ -164,8 +162,130 @@ export default () => {
 
   const slicedChamps = sortedChamps.slice(0, moreC)
   const addMore = () => setMore(moreC + 4)
+  const switchRank = () => setRank(sRank == 0 ? 1 : 0)
+  const matchesRender = matchHistoryChamp.map((mh, i) => {
+    const flipCard = () => {
+      let c1 = document.getElementById(`card1${i}`)
+      let c2 = document.getElementById(`card2${i}`)
+      c1.style.display = c1.style.display != 'none' ? 'none' : 'flex'
+      c2.style.display = c2.style.display != 'flex' ? 'flex' : 'none'
+      c1.style.animation =
+        'fade-in 1.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'
+      c2.style.animation =
+        'fade-in 1.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'
+    }
+    const bgWin = {
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${mh.name}_1.jpg)`
+    }
+    const dmg =
+      Math.abs(mh.pStat.stats.totalDamageDealtToChampions) > 999
+        ? Math.sign(mh.pStat.stats.totalDamageDealtToChampions) *
+            (
+              Math.abs(mh.pStat.stats.totalDamageDealtToChampions) / 1000
+            ).toFixed(1) +
+          'k'
+        : Math.sign(mh.pStat.stats.totalDamageDealtToChampions) *
+          Math.abs(mh.pStat.stats.totalDamageDealtToChampions)
+    const it1 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item0}.png`
+    const it2 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item1}.png`
+    const it3 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item2}.png`
+    const it4 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item3}.png`
+    const it5 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item4}.png`
+    const it6 = `http://ddragon.leagueoflegends.com/cdn/10.2.1/img/item/${mh.pStat.stats.item5}.png`
+    return (
+      <Col key={i}>
+        <MyCard style={bgWin} onClick={() => flipCard()}>
+          <CardKarada id={`card1${i}`}>
+            <MyCardImg
+              style={
+                mh.pStat.stats.win
+                  ? { border: '3px solid #4feac0' }
+                  : { border: '3px solid red' }
+              }
+              src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/champion/${mh.name}.png`}
+            />
+            <MyCardH1
+              style={
+                mh.pStat.stats.win ? { color: '#1a78ae' } : { color: '#c6443e' }
+              }
+            >
+              {mh.pStat.stats.win ? 'Victory' : 'Defeat'}
+            </MyCardH1>
+            <MyCardLast>
+              <MyCardLastOne>
+                <h4>
+                  <img
+                    style={{ verticalAlign: 'middle' }}
+                    src="http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png"
+                  />
+                  {mh.pStat.stats.totalMinionsKilled +
+                    mh.pStat.stats.neutralMinionsKilled}{' '}
+                  Cs
+                </h4>
+                <h4>
+                  <img
+                    style={{ verticalAlign: 'top' }}
+                    src="https://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png"
+                  />
+                  {`${mh.pStat.stats.kills} / `}
+                  <span style={{ color: 'red' }}>{mh.pStat.stats.deaths}</span>
+                  {` / ${mh.pStat.stats.assists}`}
+                </h4>
+              </MyCardLastOne>
+              <MyCardLastTwo>
+                <h4>{moment(mh.date + mh.duration * 1000).fromNow()}</h4>
+                <h4>{moment.utc(mh.duration * 1000).format('m:ss')} mins</h4>
+              </MyCardLastTwo>
+            </MyCardLast>
+          </CardKarada>
+          <CardKarada style={{ display: 'none' }} id={`card2${i}`}>
+            <MyCardTitle>
+              <h3
+                style={{
+                  fontWeight: 'bold',
+                  fontFamily: 'Roboto',
+                  letterSpacing: '2px',
+                  textAlign: 'center'
+                }}
+              >
+                {mh.name}
+              </h3>
+              <h5>
+                <b>Champion Level: </b>
+                {mh.pStat.stats.champLevel}
+              </h5>
+            </MyCardTitle>
+            <MyCardBody>
+              <h5>
+                <b>Total Damage: </b>
+                {dmg}
+              </h5>
+              <h5>
+                <b>Vision Score: </b>
+                {mh.pStat.stats.visionScore}
+              </h5>
+              <Row>
+                <Col sm="12" md="12" lg="12">
+                  <ItemImg src={it1} />
+                  <ItemImg src={it2} />
+                  <ItemImg src={it3} />
+                </Col>
+              </Row>
+              <Row>
+                <Col sm="12" md="12" lg="12">
+                  <ItemImg src={it4} />
+                  <ItemImg src={it5} />
+                  <ItemImg src={it6} />
+                </Col>
+              </Row>
+            </MyCardBody>
+          </CardKarada>
+        </MyCard>
+      </Col>
+    )
+  })
 
-  const awoo = slicedChamps.map(element => {
+  const mainChampsRender = slicedChamps.map(element => {
     const obj = champs.find(x => x.key === element.champid.toString())
     const newobj = { ...element, ...obj }
     const socc = newobj.champP
@@ -194,97 +314,211 @@ export default () => {
     )
   })
 
-  return (
-    <div>
-      {loadingS ? (
-        <FadeIn>
-          <Loading />
-        </FadeIn>
-      ) : (
-        <Main>
-          <FadeIn>
-            <Container className="Container">
-              <Pdiv className="Pdiv" id="pfp">
-                <H1 className="H1">{state.SummonerData.playerData.name}</H1>
-                <Pl className="P1">
-                  <Pfp
-                    className="Pfp"
-                    id="img"
-                    src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/profileicon/${state.SummonerData.playerData.profileIconId}.png`}
-                  />
-                  <span>Lvl {state.SummonerData.playerData.summonerLevel}</span>
-                </Pl>
-              </Pdiv>
-              <Rdiv>
-                <H4 className="H4">
-                  {rank[0].tier + ' ' + rank[0].rank + ' ' + rank[0].lp}LP
-                </H4>
-                <Rp
-                  src={require(`../../assets/rankedLogos/${rank[0].tier}.png`)}
+  return loadingS ? (
+    <Loading />
+  ) : (
+    <PDiv>
+      <Containerr fluid>
+        <Row style={{ marginBottom: '7vh' }}>
+          <Col sm="12" md="3" lg="3">
+            <Row>
+              <Col sm="12" md="5" lg="5">
+                <Pfp
+                  id="img"
+                  sm="12"
+                  md="4"
+                  lg="4"
+                  src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/profileicon/${state.SummonerData.playerData.profileIconId}.png`}
                 />
-                <H4>
-                  {rank[0].wins}W | {rank[0].losses}L
+              </Col>
+              <Col>
+                <Row>
+                  <H1>{state.SummonerData.playerData.name}</H1>
+                </Row>
+                <Row>
+                  <Lvl>Lvl {state.SummonerData.playerData.summonerLevel}</Lvl>
+                </Row>
+              </Col>
+            </Row>
+          </Col>
+          <Col sm="12" md="5" lg="5">
+            <Row>
+              <MyH1>{rank[sRank] ? rank[sRank].qType : 'Unranked'}</MyH1>
+            </Row>
+            <Row>
+              <MyCol sm="3" md="4" lg="4">
+                <H4 style={{ textAlign: 'right' }}>
+                  {rank[sRank]
+                    ? rank[sRank].tier +
+                      ' ' +
+                      rank[sRank].rank +
+                      ' ' +
+                      rank[sRank].lp +
+                      'LP'
+                    : ''}
                 </H4>
-                <H5>Win Ratio {Math.round(rank[0].wr)}%</H5>
-              </Rdiv>
-              <Cstat>
-                <ReactCardCarousel disable_keydown={false}>
-                  {awoo}
-                  <Cardu
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),url(' +
-                        more +
-                        ')'
-                    }}
-                  >
-                    <CardBody className="Cbody">
-                      <a className="load" onClick={() => addMore()}>
-                        Load More
-                      </a>
-                    </CardBody>
-                  </Cardu>
-                </ReactCardCarousel>
-
-                {/* <Col>
-                  <Arrow id="btn" onClick={() => expand()} className="arrow">
-                    Show More
-                  </Arrow>
-                </Col> */}
-              </Cstat>
-              <Mdiv>
-                <Row>{printData} </Row>
-              </Mdiv>
-            </Container>
-          </FadeIn>
-        </Main>
-      )}
-    </div>
+              </MyCol>
+              <MyCol1 sm="6" md="4" lg="4">
+                <Rp
+                  src={
+                    rank[sRank]
+                      ? require(`../../assets/rankedLogos/${rank[sRank].tier}.png`)
+                      : require(`../../assets/rankedLogos/UNRANKED.png`)
+                  }
+                />
+              </MyCol1>
+              <MyCol2 sm="3" md="4" lg="4">
+                <Row>
+                  <Col sm="12" md="12" lg="12">
+                    <H4>
+                      {rank[sRank]
+                        ? rank[sRank].wins +
+                          ' Wins | ' +
+                          rank[sRank].losses +
+                          ' Losses'
+                        : ''}
+                    </H4>
+                  </Col>
+                  <Col sm="12" md="12" lg="12">
+                    <H5>
+                      {rank[sRank]
+                        ? `WinRate ${Math.round(rank[sRank].wr)}%`
+                        : ''}
+                    </H5>
+                  </Col>
+                </Row>
+              </MyCol2>
+            </Row>
+            <Row style={{ justifyContent: 'center' }}>
+              <Sbutton onClick={() => switchRank()}>Rank Switch</Sbutton>
+            </Row>
+          </Col>
+          <Col sm="12" md="4" lg="4">
+            <Cstat>
+              <ReactCardCarousel disable_keydown={false}>
+                {mainChampsRender}
+                <Cardu
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),url(' +
+                      more +
+                      ')'
+                  }}
+                >
+                  <CardBody>
+                    <a onClick={() => addMore()}>Load More</a>
+                  </CardBody>
+                </Cardu>
+              </ReactCardCarousel>
+            </Cstat>
+          </Col>
+        </Row>
+        <Row
+          style={{
+            borderRadius: '20px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            marginBottom: '12vh'
+          }}
+        >
+          {matchesRender}
+          <button onClick={() => moreChampsu()}>ADD MORE</button>
+        </Row>
+      </Containerr>
+    </PDiv>
   )
 }
 
-const MyCard = styled.div`
+const ItemImg = styled.img`
+  width: 17%;
+`
+
+const Sbutton = styled.button`
+  align-self: center;
+  cursor: pointer;
+  background: transparent;
+  padding: 1rem 1rem;
+  margin: 0 1rem;
+  margin-top: 1rem;
+  transition: all 0.5s ease;
+  color: #fff;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  outline: none;
+  box-shadow: 20px 38px 34px -26px rgba(255, 255, 255, 0.2);
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  border: solid 2px #fff;
+  transition: 0.4s ease-out;
+
+  :focus {
+    outline: 0;
+  }
+  :active {
+    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+`
+
+const MyCol = styled(Col)`
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`
+const MyCol1 = styled(MyCol)`
+  justify-content: center;
+`
+const MyCol2 = styled(MyCol)`
+  justify-content: center;
+  flex-direction: column;
+`
+
+const PDiv = styled.body`
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url('https://d3gz42uwgl1r1y.cloudfront.net/fi/fireflufferz/submission/2016/05/015f94d8c6b0bbe38b110b54c88094ef/2500x1500.jpg');
+  background-repeat: repeat;
+  /* background-position: center; */
+  background-size: 100%;
+`
+const Containerr = styled(Container)`
+  transition: 1s ease;
+  margin-top: 15vh;
+  padding-right: 90px;
+  padding-left: 90px;
+  @media only screen and (max-width: 600px) {
+    padding: 0;
+  }
+`
+
+const MyCard = styled.div`
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  flex-wrap: nowrap;
-  flex-direction: column;
   width: 300px;
   height: 350px;
   border: none;
   color: white;
   border-radius: 10%;
-  margin-top: 3vh;
-  /* margin-left: auto;
-  margin-right: auto; */
+  margin-top: 5vh;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5vh;
+  transition: 0.4s ease-out;
+  cursor: pointer;
+  :hover {
+    transform: translateY(-20px);
+  }
+`
+const CardKarada = styled.div`
+  flex-wrap: nowrap;
+  flex-direction: column;
+  display: flex;
 `
 
 const MyCardImg = styled.img`
   width: 40%;
-  border-radius: 10%;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
   margin: 2vh auto;
 `
+
 const MyCardH1 = styled.h1`
   color: white;
   width: 100%;
@@ -301,9 +535,10 @@ const MyCardLast = styled.div`
   width: 100%;
   margin: 1vw 0;
 `
+
 const MyCardLastOne = styled.div`
   width: 50%;
-  margin-top: 2rem;
+  margin-top: 1rem;
   h4 {
     text-align: left;
     font-size: 17px;
@@ -313,85 +548,34 @@ const MyCardLastOne = styled.div`
 
 const MyCardLastTwo = styled.div`
   width: 50%;
-  text-align: right;
-  font-size: 14px;
-`
+  margin-top: 1rem;
 
-const Main = styled.div`
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('https://d3gz42uwgl1r1y.cloudfront.net/fi/fireflufferz/submission/2016/05/015f94d8c6b0bbe38b110b54c88094ef/2500x1500.jpg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  overflow-y: hidden;
-`
-
-const Container = styled.div`
-  box-sizing: border-box;
-  height: auto;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  transition: 1s ease;
-  margin: 10vh 5vw 0vh;
-  @media screen and (max-width: 600px) {
-    flex-direction: column;
-    margin-top: 10vh;
+  h4 {
+    text-align: right;
+    font-size: 17px;
+    margin-right: 0.5rem;
   }
 `
 
-const Pdiv = styled.div`
-  transition: 1s ease;
-  margin-top: 2vh;
-  width: 20%;
-  height: 40vh;
-  @media screen and (max-width: 600px) {
-    width: 100%;
-    margin: 0 auto;
+const MyCard2 = styled(MyCard)`
+  transform: translateY(-20px);
+  display: none;
+  :hover {
   }
 `
+const MyCardBody = styled.div``
 
-const Rdiv = styled.div`
-  color: #09fdc0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  height: 40vh;
-  width: 40%;
-  @media screen and (max-width: 600px) {
-    width: 100%;
-    margin-top: 3vh;
-    margin-bottom: 3vh;
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-`
+const MyCardTitle = styled.div``
 
 const Cstat = styled.div`
-  position: relative;
-  height: 40vh;
-  width: 40%;
   display: flex;
   flex: 1;
-  justify-content: right;
+  width: 500px;
   flex-wrap: wrap;
-  align-items: middle;
-  @media (max-width: 600px) {
+  height: 400px;
+  @media screen and (max-width: 600px) {
     width: 100%;
-    margin: 0 auto;
-    margin-top: 5vh;
-    margin-bottom: 5vh;
-    flex-direction: column;
   }
-`
-
-const Mdiv = styled.div`
-  width: 100%;
-  height: 50vh;
-  background-color: rgba(0, 0, 0, 0.329);
-  border-radius: 10px;
 `
 
 const Cheader = styled(CardHeader)`
@@ -403,15 +587,6 @@ const Cheader = styled(CardHeader)`
   text-align: center;
   font-family: 'Poppins', sans-serif !important;
   letter-spacing: 2px;
-`
-
-const Cimg = styled(CardImg)`
-  margin-top: 5vw;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-  width: 300px;
-  border: none;
 `
 
 const Cardu = styled(Card)`
@@ -426,15 +601,17 @@ const Cardu = styled(Card)`
   font-size: 12px;
   text-transform: uppercase;
   border-radius: 10px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   a {
     padding: 0.5rem;
     font-size: 25px;
     font-weight: 900;
-    margin-right: 10rem;
+    margin-right: auto;
+    margin-left: auto;
     color: rgb(1, 255, 255) !important;
     background-color: #159e9e8a;
     cursor: pointer;
-    width: 45%;
+    width: 65%;
     transition: 0.25s ease;
     border-radius: 5%;
   }
@@ -450,9 +627,18 @@ const Cardu = styled(Card)`
     font-size: 15px;
     margin-top: 11.5rem;
   }
+  .Ctitle {
+    color: rgb(255, 230, 0);
+    font-family: fantasy;
+  }
+  .Cbot {
+    text-align: left;
+    font-size: 15px;
+    color: white;
+  }
   @media only screen and (max-width: 600px) {
-    height: 300px;
-    width: 280px;
+    height: 280px;
+    width: 260px;
     h2 {
       margin-top: 7rem;
     }
@@ -463,46 +649,48 @@ const Cardu = styled(Card)`
   }
 `
 
-const Pl = styled.div`
-  position: relative;
-  text-align: center;
-  color: white;
-`
-
 const H1 = styled.h1`
-  margin-top: 5px;
-  margin-bottom: 2rem;
+  text-align: left;
+  color: white;
+  letter-spacing: 2px;
+`
+const MyH1 = styled.h1`
+  text-transform: uppercase;
   text-align: center;
+  width: 100%;
+  color: white;
+  font-family: 'Roboto Condensed', sans-serif;
+`
+const Lvl = styled.h4`
+  text-align: left;
   color: white;
   letter-spacing: 2px;
 `
 
 const Pfp = styled.img`
-  border-radius: 80px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
   width: 100%;
-  max-width: 150px;
+  max-width: 170px;
   height: auto;
 `
+
 const Rp = styled.img`
   width: 100%;
-  max-width: 150px;
-  height: auto;
+  max-width: 190px;
   @media only screen and (max-width: 600px) {
     width: 100%;
   }
 `
 
 const H4 = styled.h4`
-  text-align: center;
-  width: 30%;
+  color: white;
+  text-align: left;
+  font-size: 1.25rem;
 `
-const H5 = styled.h4`
-  width: 100%;
-  text-align: center;
-  margin-top: -7rem;
+
+const H5 = styled.h5`
+  text-align: left;
+  color: white;
+
   @media only screen and (max-width: 600px) {
     margin-left: 0;
     margin-right: 0;
