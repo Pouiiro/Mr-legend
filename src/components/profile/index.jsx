@@ -6,7 +6,6 @@ import ReactCardCarousel from 'react-card-carousel'
 import styled from 'styled-components'
 import Loading from '../loading/Loading'
 import more from '../../assets/images/more.png'
-import { Div } from 'global/styles'
 import {
   Container,
   Row,
@@ -28,10 +27,6 @@ export default () => {
   const [sRank, setRank] = useState(0)
   const [gamesu, setGamsu] = useState(false)
   const [miniLoad, setMiniLoad] = useState(false)
-
-  const Arrow = ({ text, className }) => {
-    return <div className={className}>{text}</div>
-  }
 
   const champs = state.champData
   const getCharacter = useCallback(async () => {
@@ -68,7 +63,6 @@ export default () => {
   }, [getCharacter])
 
   const moreChampsu = async () => {
-    console.log({ s: s, e: e })
     s = s + 5
     e = e + 5
     await axios
@@ -80,7 +74,6 @@ export default () => {
         setGamsu(true)
       })
     setGamsu(false)
-    console.log({ s: s, e: e })
   }
   let arrParti = []
 
@@ -557,12 +550,6 @@ const MyCardLastTwo = styled.div`
   }
 `
 
-const MyCard2 = styled(MyCard)`
-  transform: translateY(-20px);
-  display: none;
-  :hover {
-  }
-`
 const MyCardBody = styled.div``
 
 const MyCardTitle = styled.div``
