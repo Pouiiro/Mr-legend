@@ -43,7 +43,7 @@ const Navbar = () => {
           from: { transform: 'translate3d(0, -10rem, 0)' },
           transform: 'translate3d(0, 0, 0)',
           backgroundColor: 'white',
-          transition: '0.1s ease in'
+          transition: '0.5s ease out'
         }
   )
 

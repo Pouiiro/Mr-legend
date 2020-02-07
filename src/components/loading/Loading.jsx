@@ -3,6 +3,7 @@ import HangOn from 'assets/images/loading.png'
 import HangOn2 from 'assets/images/loading2.png'
 import HangOn3 from 'assets/images/loading3.png'
 import styled from 'styled-components'
+import FadeIn from 'react-fade-in'
 
 const Loading = () => {
   const images = [HangOn, HangOn2, HangOn3]
@@ -34,17 +35,19 @@ const Loading = () => {
     }
   }, [])
   return (
-    <Div>
-      <H1>Fetching Data...</H1>
-      <Containers>
-        <Img id="img" src={principalImage} />
-        <H1s>
-          <span></span>
-          <span></span>
-          <span></span>
-        </H1s>
-      </Containers>
-    </Div>
+    <FadeIn>
+      <Div>
+        <H1>Fetching Data...</H1>
+        <Containers>
+          <Img id="img" src={principalImage} />
+          <H1s>
+            <span></span>
+            <span></span>
+            <span></span>
+          </H1s>
+        </Containers>
+      </Div>
+    </FadeIn>
   )
 }
 

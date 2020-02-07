@@ -13,15 +13,17 @@ body {
   margin: 0;
   overflow: scroll;
   overflow-x: hidden;
-  background-color: #fff !important;
 }
+
 body::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
+
 body::-webkit-scrollbar-thumb {
   background: #575757;
 }
+
 @-webkit-keyframes fade-in {
   0% {
     opacity: 0;

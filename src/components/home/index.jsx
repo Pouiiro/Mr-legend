@@ -6,7 +6,6 @@ import Intro from './Intro'
 import Loading from '../loading/Loading'
 import GInfo from './Gameinfo'
 import Cinfo from './Champsinfo'
-
 import { ContainerS } from 'global/styles'
 import 'global/btn.css'
 

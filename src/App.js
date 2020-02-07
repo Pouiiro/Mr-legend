@@ -1,9 +1,7 @@
 import React from 'react'
 import Routes from './Routes'
-
-// import ScrollToTop from 'react-router-scroll-top'
-
 import MrLegendProvider from 'providers/AppProvider'
+import './index.css'
 
 const App = () => {
   return (
