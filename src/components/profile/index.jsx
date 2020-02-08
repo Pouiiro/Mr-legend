@@ -2,13 +2,13 @@ import React, { useEffect, useContext, useCallback, useState } from 'react'
 import axios from 'axios'
 import moment from 'moment'
 import { MrLegendContext } from 'providers/AppProvider'
-import ReactCardCarousel from 'react-card-carousel'
 import styled from 'styled-components'
 import Loading from '../loading/Loading'
-import more from '../../assets/images/more.png'
 import { LoopCircleLoading } from 'react-loadingg'
-import { ButtonS, ButtonL } from 'components/common/Buttons/Button'
+import { ButtonL, ButtonC } from 'components/common/Buttons/Button'
 import FadeIn from 'react-fade-in'
+import Slider from 'react-slick'
+import '../common/Card/card.css'
 import {
   Cheader,
   Cardu,
@@ -20,17 +20,11 @@ import {
   MyCardLastOne,
   MyCardLastTwo
 } from 'components/common/Card/Card'
-import {
-  Containerr,
-  Cstat,
-  MyCol,
-  MyCol1,
-  MyCol2
-} from 'components/common/Containers/ProfileContainers'
+import { Containerr } from 'components/common/Containers/ProfileContainers'
 import { Row, Col, CardTitle, CardBody, CardFooter } from 'shards-react'
 
 var s = 0
-var e = 5
+var e = 4
 
 export default () => {
   const [loadingS, setLoadingS] = useState(true)
@@ -40,18 +34,28 @@ export default () => {
   const [gamesu, setGamsu] = useState(false)
   const [miniLoad, setMiniLoad] = useState(false)
 
+  var settings = {
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1
+  }
+
   const champs = state.champData
   const getCharacter = useCallback(async () => {
     try {
       const summoner = await axios
-        .get(`http://127.0.0.1:3000/summoner?name=${user}`)
+        .get(`https://mr-legend.herokuapp.com/summoner?name=${user}`)
         .then(results => results.data)
       const sumdata = await axios
         .all([
-          axios.get(`http://127.0.0.1:3000/rank?id=${summoner.id}`),
-          axios.get(`http://127.0.0.1:3000/mastery?id=${summoner.id}`),
+          axios.get(`https://mr-legend.herokuapp.com/rank?id=${summoner.id}`),
           axios.get(
-            `http://127.0.0.1:3000/matches?id=${summoner.accountId}&s=0&e=5`
+            `https://mr-legend.herokuapp.com/mastery?id=${summoner.id}`
+          ),
+          axios.get(
+            `https://mr-legend.herokuapp.com/matches?id=${summoner.accountId}&s=0&e=4`
           )
         ])
         .then(resArr => [resArr[0].data, resArr[1].data, resArr[2].data])
@@ -78,11 +82,11 @@ export default () => {
     event.preventDefault()
 
     setMiniLoad(true)
-    s = s + 5
-    e = e + 5
+    s = s + 4
+    e = e + 4
     await axios
       .get(
-        `http://127.0.0.1:3000/matches?id=${state.SummonerData.playerData.accountId}&s=${s}&e=${e}`
+        `https://mr-legend.herokuapp.com/matches?id=${state.SummonerData.playerData.accountId}&s=${s}&e=${e}`
       )
       .then(val => {
         val.data.map(x => state.SummonerData.matchH.push(x))
@@ -95,7 +99,7 @@ export default () => {
 
   const matchH = state.SummonerData.matchH
 
-  const wiwi = matchH.map(ind => {
+  matchH.map(ind => {
     const iwi = ind.participantIdentities.map(owo => owo.player.summonerId)
     const uwu = ind.participantIdentities.map(x => x.participantId)
     const num1 = uwu
@@ -310,20 +314,15 @@ export default () => {
         ? Math.sign(socc) * (Math.abs(socc) / 1000).toFixed(1) + 'k'
         : Math.sign(socc) * Math.abs(socc)
     return (
-      <Cardu
-        key={newobj.key}
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),url(' +
-            imgs +
-            ')'
-        }}
-      >
+      <Cardu key={newobj.key}>
+        <img src={imgs} alt="" srcset="" />
         <Cheader className="Cheader">{newobj.id}</Cheader>
         <CardBody className="Cbody">
           <CardTitle className="Ctitle">{newobj.title}</CardTitle>
           <h2> Mastery {newobj.lvl}</h2>
-          <CardFooter className="cbot">{succ} Mastery Points</CardFooter>
+          <CardFooter className="cbot">
+            <span>{succ}</span> Mastery Points
+          </CardFooter>
         </CardBody>
       </Cardu>
     )
@@ -340,92 +339,108 @@ export default () => {
       ></Bggg>
       <Containerr fluid>
         <Row style={{ marginBottom: '7vh' }}>
-          <Col sm="12" md="3" lg="3">
-            <Row>
-              <Col sm="12" md="5" lg="5">
-                <Pfp
-                  id="img"
-                  sm="12"
-                  md="4"
-                  lg="4"
-                  src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/profileicon/${state.SummonerData.playerData.profileIconId}.png`}
-                />
-              </Col>
-              <Col>
-                <Row>
-                  <H1>{state.SummonerData.playerData.name}</H1>
-                </Row>
-                <Row>
-                  <Lvl>Lvl {state.SummonerData.playerData.summonerLevel}</Lvl>
-                </Row>
-              </Col>
-            </Row>
-          </Col>
-          <Col sm="12" md="5" lg="5" style={{ color: 'white' }}>
-            <Row>
-              <MyH1>{rank[sRank] ? rank[sRank].qType : 'Unranked'}</MyH1>
-            </Row>
-            <Row>
-              <MyCol sm="3" md="4" lg="4">
-                <H4 style={{ textAlign: 'right' }}>
-                  {rank[sRank]
-                    ? rank[sRank].tier +
-                      ' ' +
-                      rank[sRank].rank +
-                      ' ' +
-                      rank[sRank].lp +
-                      'LP'
-                    : ''}
-                </H4>
-              </MyCol>
-              <MyCol1 sm="6" md="4" lg="4">
-                <Rp
-                  src={
-                    rank[sRank]
-                      ? require(`../../assets/rankedLogos/${rank[sRank].tier}.png`)
-                      : require(`../../assets/rankedLogos/UNRANKED.png`)
-                  }
-                />
-              </MyCol1>
-              <MyCol2 sm="3" md="4" lg="4">
-                <Row>
-                  <Col sm="12" md="12" lg="12">
-                    <H4>
-                      {rank[sRank]
-                        ? rank[sRank].wins +
-                          ' Wins | ' +
-                          rank[sRank].losses +
-                          ' Losses'
-                        : ''}
-                    </H4>
-                  </Col>
-                  <Col sm="12" md="12" lg="12">
-                    <H5>
-                      {rank[sRank]
-                        ? `WinRate ${Math.round(rank[sRank].wr)}%`
-                        : ''}
-                    </H5>
-                  </Col>
-                </Row>
-              </MyCol2>
-            </Row>
-            <Row style={{ justifyContent: 'center' }}>
-              <ButtonS onClick={() => switchRank()}>Switch Rank</ButtonS>
-            </Row>
-          </Col>
-          <Col sm="12" md="4" lg="4">
-            <Cstat>
-              <ReactCardCarousel disable_keydown={false}>
-                {mainChampsRender}
-                <img
-                  style={{ height: '380px', width: '300px' }}
-                  src={more}
-                  onClick={() => addMore()}
-                />
-              </ReactCardCarousel>
-            </Cstat>
+          <Col sm="12" md="12" lg="12">
+            <Slider {...settings}>
+              <div class="wrapper">
+                <div class="profile-card js-profile-card">
+                  <div class="profile-card__img">
+                    <img
+                      src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/profileicon/${state.SummonerData.playerData.profileIconId}.png`}
+                      alt="profile card"
+                    />
+                  </div>
+
+                  <div class="profile-card__cnt js-profile-cnt">
+                    <div class="profile-card__name">
+                      {state.SummonerData.playerData.name}
+                    </div>
+                    <div class="profile-card__txt">
+                      Lvl {state.SummonerData.playerData.summonerLevel}
+                    </div>
+                    <div class="profile-card-loc">
+                      {rank[sRank] ? rank[sRank].qType : 'Unranked'}
+                    </div>
+
+                    <div class="profile-card-inf">
+                      <div class="profile-card-inf__item1">
+                        <div class="profile-card-inf__title">
+                          {rank[sRank]
+                            ? rank[sRank].tier + ' ' + rank[sRank].rank
+                            : ''}
+                        </div>
+                        <div class="profile-card-inf__txt">
+                          {rank[sRank] ? rank[sRank].lp + ' LP' : ''}
+                        </div>
+                      </div>
+
+                      <div
+                        class="profile-card-inf__item"
+                        style={{ width: '50%  ' }}
+                      >
+                        <div class="profile-card-inf__title">
+                          <img
+                            src={
+                              rank[sRank]
+                                ? require(`../../assets/rankedLogos/${rank[sRank].tier}.png`)
+                                : require(`../../assets/rankedLogos/UNRANKED.png`)
+                            }
+                            alt=""
+                          />
+                        </div>
+                      </div>
+
+                      <div class="profile-card-inf__item2">
+                        <div class="profile-card-inf__title">
+                          {rank[sRank]
+                            ? rank[sRank].wins +
+                              'W | ' +
+                              rank[sRank].losses +
+                              'L'
+                            : ''}
+                        </div>
+                        <div class="profile-card-inf__txt">
+                          {rank[sRank]
+                            ? `${Math.round(rank[sRank].wr)}% WR`
+                            : ''}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* <div class="profile-card-social">///</div> */}
+
+                    <div class="profile-card-ctr">
+                      {/* <button class="profile-card__button button--blue js-message-btn">
+                        Message
+                      </button> */}
+                      <button
+                        onClick={() => switchRank()}
+                        class="profile-card__button button--blue"
+                      >
+                        Switch Rank
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="wrapper1">
+                <div class="profile-card1">
+                  <Slider {...settings}>
+                    {mainChampsRender}
+                    <ButtonC onClick={() => addMore()}>Load More</ButtonC>
+                  </Slider>
+                </div>
+              </div>
+            </Slider>
           </Col>
         </Row>
+        {/* <Row>
+          <Col sm="12" md="12" lg="12">
+            <ButtonL onClick={e => moreChampsu(e)}>
+              <span class="top">Load More</span>
+              <span class="bottom">˅</span>
+            </ButtonL>
+          </Col>
+        </Row> */}
         <Row
           style={{
             borderRadius: '20px',
@@ -458,16 +473,16 @@ export default () => {
   )
 }
 
+const Cimg = styled.img`
+  height: 330px;
+  width: 300px;
+`
+
 const Bggg = styled.img`
-  /* Set rules to fill background */
   min-height: 100%;
   min-width: 1024px;
-
-  /* Set up proportionate scaling */
   width: 100%;
   height: auto;
-
-  /* Set up positioning */
   position: fixed;
   top: 0;
   left: 0;

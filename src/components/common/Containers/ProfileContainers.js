@@ -3,9 +3,13 @@ import { Container, Col } from 'shards-react'
 
 export const Containerr = styled(Container)`
   transition: 1s ease;
-  margin-top: 15vh;
-  padding-right: 90px;
-  padding-left: 90px;
+  margin-top: 10vh;
+  padding-right: 10%;
+  padding-left: 10%;
+  @media screen and (max-width: 600px) {
+    padding-right: 0;
+    padding-left: 0;
+  }
 `
 
 export const Cstat = styled.div`

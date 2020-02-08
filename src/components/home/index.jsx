@@ -15,7 +15,7 @@ export default () => {
 
   const getCharacter = useCallback(async () => {
     try {
-      const { data } = await axios.get(`http://127.0.0.1:3000/status`)
+      const { data } = await axios.get(`https://mr-legend.herokuapp.com/status`)
       setState({
         ...state,
         gameData: data[0],

@@ -79,26 +79,30 @@ export const Cheader = styled(CardHeader)`
   background-color: rgba(0, 0, 0, 0) !important;
   color: rgb(255, 255, 255);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 27px;
   border: none;
   text-align: center;
   font-family: 'Poppins', sans-serif !important;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
 `
 
 export const Cardu = styled(Card)`
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: right;
-  height: 380px;
-  width: 300px;
+  position: relative;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+  height: 500px;
+  width: 100%;
   text-align: center;
   border: none;
   color: #fff;
   font-size: 12px;
   text-transform: uppercase;
-  /* border-radius: 10px; */
-  /* box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22); */
+  border-radius: 7px;
+  img {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    z-index: -1;
+  }
   a {
     padding: 0.5rem;
     font-size: 25px;
@@ -119,19 +123,28 @@ export const Cardu = styled(Card)`
     background-color: transparent;
   }
   h2 {
-    color: rgb(255, 255, 255);
     text-align: left;
-    font-size: 15px;
-    margin-top: 11.5rem;
+    font-size: 19px;
+    margin-top: 8rem;
   }
   .Ctitle {
     color: rgb(255, 230, 0);
     font-family: fantasy;
+    font-size: 22px;
+    letter-spacing: 3px;
   }
-  .Cbot {
+  .cbot {
+    border: none;
     text-align: left;
     font-size: 15px;
-    color: white;
+    letter-spacing: 3px;
+    font-family: 'Poppins';
+    span {
+      color: white;
+      font-weight: bold;
+      font-family: 'Roboto';
+      font-size: 17px;
+    }
   }
   @media only screen and (max-width: 600px) {
     height: 280px;
