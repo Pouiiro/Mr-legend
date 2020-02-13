@@ -20,13 +20,9 @@ const Loading = () => {
       intervalSetClass = setInterval(() => {
         setPrincipalImage(images[counter])
         counter += 1
-
         if (counter === images.length) {
           counter = 0
         }
-        // setTimeout(() => {
-        //   setPrincipalImage(images[2])
-        // }, 2400)
       }, 800)
     }
 
@@ -69,8 +65,8 @@ const H1 = styled.h1`
       opacity: 0;
     }
   }
-  @media screen and (max-width: 420px) {
-    font-size: 2rem;
+  @media screen and (max-width: 600px) {
+    font-size: 1.5rem;
   }
 `
 
@@ -100,12 +96,30 @@ const H1s = styled.div`
   span:nth-child(3) {
     animation-delay: 0.4s;
   }
-  @media screen and (max-width: 430px) {
-    bottom: 70%;
-    right: 6%;
-    font-size: 4rem;
+  @media screen and (max-width: 600px) and (min-width: 361px) {
+    bottom: 80px;
+    right: 30vw;
+    color: white;
+    font-size: 6rem;
+    span {
+      height: 6px;
+      width: 6px;
+      display: inline-block;
+      margin: 2px;
+    }
   }
-
+  @media screen and (max-width: 361px) and (min-width: 300px) {
+    bottom: 82px;
+    right: 28vw;
+    color: white;
+    font-size: 6rem;
+    span {
+      height: 6px;
+      width: 6px;
+      display: inline-block;
+      margin: 2px;
+    }
+  }
   @keyframes blink {
     0% {
       opacity: 0.2;
@@ -138,6 +152,6 @@ const Img = styled.img`
   display: block;
   margin-left: auto;
   @media screen and (max-width: 430px) {
-    /* width: 100%; */
+    width: 50%;
   }
 `

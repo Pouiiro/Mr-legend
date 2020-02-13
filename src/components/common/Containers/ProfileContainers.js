@@ -2,24 +2,17 @@ import styled from 'styled-components'
 import { Container, Col } from 'shards-react'
 
 export const Containerr = styled(Container)`
-  transition: 1s ease;
   margin-top: 10vh;
-  padding-right: 10%;
-  padding-left: 10%;
   @media screen and (max-width: 600px) {
-    padding-right: 0;
-    padding-left: 0;
+    margin-top: 6vh;
   }
 `
 
 export const Cstat = styled.div`
   display: flex;
   flex: 1;
-  width: 500px;
+  width: 100%;
   flex-wrap: wrap;
-  @media screen and (max-width: 600px) {
-    width: 100%;
-  }
 `
 //
 

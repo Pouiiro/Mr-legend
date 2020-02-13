@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useSpring, animated, config } from 'react-spring'
 import { NavLink } from 'react-router-dom'
@@ -67,9 +67,9 @@ const Navbar = () => {
             <NavLink activeStyle={styleAc} to="/profile" exact>
               Profile
             </NavLink>
-            <NavLink activeStyle={styleAc} to="/ranking" exact>
+            {/* <NavLink activeStyle={styleAc} disabled to="/ranking" exact>
               Ranking
-            </NavLink>
+            </NavLink> */}
             <Span />
             <NavLink activeStyle={styleAc} to="/about" exact>
               About

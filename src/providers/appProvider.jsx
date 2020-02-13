@@ -16,7 +16,8 @@ export default ({ children }) => {
     },
     gameData: [],
     champData: [],
-    rotationChamps: []
+    rotationChamps: [],
+    QueueData: []
   })
 
   const chichi = () => {

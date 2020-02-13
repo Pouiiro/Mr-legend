@@ -1,53 +1,111 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
-import { Parallax } from 'react-parallax'
-import bg3 from 'assets/images/bg3.jpg'
-import { Div2, Title1 } from 'global/styles'
+import { ParallaxLayer } from 'react-spring/renderprops-addons'
+import Slider from 'react-slick'
+import { Title1, ContainerS, CDiv } from 'global/styles'
 import 'global/btn.css'
-import { Container, Row, Col, Card, CardHeader, CardImg } from 'shards-react'
+import { Row, Col, Card, CardHeader, CardImg } from 'shards-react'
 import { MrLegendContext } from 'providers/AppProvider'
 
 const Cinfo = () => {
   const { state } = useContext(MrLegendContext)
-
   const rotation = state.rotationChamps
   const champs = state.champData
+  const settings = {
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 4,
+    initialSlide: 0,
+    arrows: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          infinite: true,
+          dots: false
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+          dots: false,
+          arrows: false
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: false,
+          arrows: false
+        }
+      }
+    ]
+  }
+  const style = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItem: 'center',
+    flexdirection: 'column',
+    flexWrap: 'nowrap'
+  }
 
   const frir = rotation.map(element => {
     const obj = champs.find(obj => obj.key === element.toString())
     return (
-      <Col key={obj.key}>
-        <Cardu
-          style={{
-            maxWidth: '300px',
-            backgroundColor: '#0000',
-            border: 'none'
-          }}
-        >
-          <Cheader>{obj.name}</Cheader>
-          <Cimg
-            src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${obj.id}_0.jpg`}
-          />
-        </Cardu>
-      </Col>
+      <div key={obj.key}>
+        <CDiv>
+          <Cardu>
+            <Cheader>{obj.name}</Cheader>
+            <Cimg
+              src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${obj.id}_0.jpg`}
+            />
+          </Cardu>
+        </CDiv>
+      </div>
     )
   })
 
   return (
-    <Parallax blur={0} bgImage={bg3} bgImageAlt="league scenery" strength={200}>
-      <Div2>
+    <>
+      <ParallaxLayer factor={0.1} offset={2.15} speed={3} style={style}>
         <Title1>Champion Rotations</Title1>
-        <Container style={{ maxWidth: '1500px' }}>
-          <Row>{frir}</Row>
-        </Container>
-      </Div2>
-    </Parallax>
+      </ParallaxLayer>
+      <ParallaxLayer factor={0.5} offset={2.16} speed={2} style={style}>
+        <ContainerS>
+          <Row>
+            <Col sm={12} md={12} lg={12}>
+              <Slider
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  cursor: 'pointer'
+                }}
+                {...settings}
+              >
+                {frir}
+              </Slider>
+            </Col>
+          </Row>
+        </ContainerS>
+      </ParallaxLayer>
+    </>
   )
 }
 export default Cinfo
 
 const Cheader = styled(CardHeader)`
   background-color: black;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   color: white;
   text-align: center;
   border-radius: 5px !important;
@@ -61,13 +119,18 @@ const Cimg = styled(CardImg)`
   margin-left: auto;
   margin-right: auto;
   box-shadow: 12px 18px 23px -4px rgba(0, 0, 0, 0.68);
+  @media only screen and (max-width: 600px) {
+    width: 180px;
+    height: 300px;
+  }
 `
 
 const Cardu = styled(Card)`
-  margin-bottom: 10vh;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  max-width: 300px;
   @media only screen and (max-width: 600px) {
-    /* margin-bottom: 5vh; */
     width: 100%;
-    margin: 3vh auto;
   }
 `

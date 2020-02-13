@@ -1,17 +1,21 @@
-import React, { useEffect, useContext, useCallback, useState } from 'react'
-import axios from 'axios'
-import moment from 'moment'
+import React, {
+  useEffect,
+  useContext,
+  useCallback,
+  useState,
+  useRef
+} from 'react'
 import { MrLegendContext } from 'providers/AppProvider'
 import styled from 'styled-components'
-import Loading from '../loading/Loading'
-import { LoopCircleLoading } from 'react-loadingg'
-import { ButtonL, ButtonC } from 'components/common/Buttons/Button'
-import FadeIn from 'react-fade-in'
 import Slider from 'react-slick'
+import FadeIn from 'react-fade-in'
 import '../common/Card/card.css'
+import { LoopCircleLoading, SemipolarLoading } from 'react-loadingg'
+import axios from 'axios'
+import moment from 'moment'
+import Loading from '../loading/Loading'
+import { ButtonL } from 'components/common/Buttons/Button'
 import {
-  Cheader,
-  Cardu,
   MyCard,
   CardKarada,
   MyCardImg,
@@ -21,58 +25,134 @@ import {
   MyCardLastTwo
 } from 'components/common/Card/Card'
 import { Containerr } from 'components/common/Containers/ProfileContainers'
-import { Row, Col, CardTitle, CardBody, CardFooter } from 'shards-react'
-
+import { Row, Col } from 'shards-react'
+import pBg from 'assets/images/pBg.jpg'
+import none from 'assets/images/none.png'
 var s = 0
-var e = 4
+var e = 5
+const oApi = 'API'
+
+moment.updateLocale('en', {
+  relativeTime: {
+    s: 'A few seconds',
+    ss: '%d seconds',
+    m: 'A min',
+    mm: '%d mins',
+    h: 'An hour',
+    hh: '%d hrs',
+    d: 'A day',
+    dd: '%d days',
+    M: 'A month',
+    MM: '%d months',
+    y: 'A year',
+    yy: '%d years'
+  }
+})
 
 export default () => {
+  const { state, user, setState } = useContext(MrLegendContext)
   const [loadingS, setLoadingS] = useState(true)
   const [moreC, setMore] = useState(6)
-  const { state, user, setState } = useContext(MrLegendContext)
   const [sRank, setRank] = useState(0)
   const [gamesu, setGamsu] = useState(false)
   const [miniLoad, setMiniLoad] = useState(false)
+  const [miniLoad2, setMiniLoad2] = useState(false)
+  const inputEl = useRef()
+
+  const errorSrc = e => {
+    e.target.src = none
+  }
+
+  const next = () => {
+    inputEl.current.slickNext()
+  }
+  const previous = () => {
+    inputEl.current.slickPrev()
+  }
+
+  var settings1 = {
+    dots: false,
+    arrows: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    fade: true,
+    draggable: false,
+    swipe: false
+  }
 
   var settings = {
     dots: true,
     infinite: false,
     speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1
+    slidesToShow: 2,
+    slidesToScroll: 4,
+    initialSlide: 0,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: false
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
   }
 
   const champs = state.champData
   const getCharacter = useCallback(async () => {
     try {
       const summoner = await axios
-        .get(`https://mr-legend.herokuapp.com/summoner?name=${user}`)
+        .get(`${oApi}summoner?name=${user}`)
         .then(results => results.data)
       const sumdata = await axios
         .all([
-          axios.get(`https://mr-legend.herokuapp.com/rank?id=${summoner.id}`),
+          axios.get(`${oApi}rank?id=${summoner.id}`),
+          axios.get(`${oApi}mastery?id=${summoner.id}`),
+          axios.get(`${oApi}matches?id=${summoner.accountId}&s=0&e=5`),
           axios.get(
-            `https://mr-legend.herokuapp.com/mastery?id=${summoner.id}`
-          ),
-          axios.get(
-            `https://mr-legend.herokuapp.com/matches?id=${summoner.accountId}&s=0&e=4`
+            'http://static.developer.riotgames.com/docs/lol/queues.json'
           )
         ])
-        .then(resArr => [resArr[0].data, resArr[1].data, resArr[2].data])
-      setState(prevState => ({
+        .then(resArr => [
+          resArr[0].data,
+          resArr[1].data,
+          resArr[2].data,
+          resArr[3].data
+        ])
+      setState({
         ...state,
         SummonerData: {
           playerData: summoner,
           rankData: sumdata[0],
           champData: sumdata[1],
           matchH: sumdata[2]
-        }
-      }))
+        },
+        QueueData: sumdata[3]
+      })
       setLoadingS(false)
     } catch (err) {
       console.log(err)
     }
-  }, [user])
+  }, [])
 
   useEffect(() => {
     getCharacter()
@@ -80,20 +160,19 @@ export default () => {
 
   const moreChampsu = async event => {
     event.preventDefault()
-
-    setMiniLoad(true)
-    s = s + 4
-    e = e + 4
+    setMiniLoad(!miniLoad)
+    s = s + 5
+    e = e + 5
     await axios
       .get(
-        `https://mr-legend.herokuapp.com/matches?id=${state.SummonerData.playerData.accountId}&s=${s}&e=${e}`
+        `${oApi}matches?id=${state.SummonerData.playerData.accountId}&s=${s}&e=${e}`
       )
       .then(val => {
         val.data.map(x => state.SummonerData.matchH.push(x))
-        setGamsu(true)
+        setGamsu(!gamesu)
       })
-    setGamsu(false)
-    setMiniLoad(false)
+    setGamsu(gamesu)
+    setMiniLoad(miniLoad)
   }
   let arrParti = []
 
@@ -110,6 +189,7 @@ export default () => {
       obj.summonerId = num2[i]
       arrParti.push(obj)
     })
+    return null
   })
 
   const pId = arrParti.filter(ew => {
@@ -125,6 +205,7 @@ export default () => {
       x => x.teamId === participantStats.teamId
     )
     const newMatch = {
+      queueId: element.queueId,
       date: element.gameCreation,
       duration: element.gameDuration,
       mode: element.gameMode,
@@ -139,6 +220,7 @@ export default () => {
     const obj = champs.find(x => x.key === element.pStat.championId.toString())
     return { name: obj.id, ...element }
   })
+
   const rank = state.SummonerData.rankData.map(data => {
     if (data.queueType === 'RANKED_FLEX_SR') {
       return {
@@ -174,14 +256,23 @@ export default () => {
   })
 
   const slicedChamps = sortedChamps.slice(0, moreC)
-  const addMore = () => setMore(moreC + 4)
-  const switchRank = () => setRank(sRank == 0 ? 1 : 0)
+
+  const addMore = () => {
+    setMiniLoad2(!miniLoad2)
+    setMore(moreC + 4)
+    setTimeout(() => {
+      setMiniLoad2(miniLoad2)
+    }, 500)
+  }
+
+  const switchRank = () => setRank(sRank === 0 ? 1 : 0)
+
   const matchesRender = matchHistoryChamp.map((mh, i) => {
     const flipCard = () => {
       let c1 = document.getElementById(`card1${i}`)
       let c2 = document.getElementById(`card2${i}`)
-      c1.style.display = c1.style.display != 'none' ? 'none' : 'flex'
-      c2.style.display = c2.style.display != 'flex' ? 'flex' : 'none'
+      c1.style.display = c1.style.display !== 'none' ? 'none' : 'flex'
+      c2.style.display = c2.style.display !== 'flex' ? 'flex' : 'none'
       c1.style.animation =
         'fade-in 1.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both'
       c2.style.animation =
@@ -190,6 +281,11 @@ export default () => {
     const bgWin = {
       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${mh.name}_1.jpg)`
     }
+    const gameInfo = state.QueueData.find(x => x.queueId == mh.queueId)
+    const simplifiedGameInfo = gameInfo.description.replace(
+      /6v6|5v5|games|/gi,
+      ''
+    )
     const dmg =
       Math.abs(mh.pStat.stats.totalDamageDealtToChampions) > 999
         ? Math.sign(mh.pStat.stats.totalDamageDealtToChampions) *
@@ -217,22 +313,23 @@ export default () => {
                     : { border: '3px solid red' }
                 }
                 src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/champion/${mh.name}.png`}
+                alt=""
               />
               <MyCardH1
                 style={
-                  mh.pStat.stats.win
-                    ? { color: '#1a78ae' }
-                    : { color: '#c6443e' }
+                  mh.pStat.stats.win ? { color: '#4feac0' } : { color: 'red' }
                 }
               >
                 {mh.pStat.stats.win ? 'Victory' : 'Defeat'}
               </MyCardH1>
+              <h6>{simplifiedGameInfo}</h6>
               <MyCardLast>
                 <MyCardLastOne>
                   <h4>
                     <img
                       style={{ verticalAlign: 'middle' }}
                       src="http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png"
+                      alt=""
                     />
                     {mh.pStat.stats.totalMinionsKilled +
                       mh.pStat.stats.neutralMinionsKilled}{' '}
@@ -242,6 +339,7 @@ export default () => {
                     <img
                       style={{ verticalAlign: 'top' }}
                       src="https://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png"
+                      alt=""
                     />
                     {`${mh.pStat.stats.kills} / `}
                     <span style={{ color: 'red' }}>
@@ -251,8 +349,23 @@ export default () => {
                   </h4>
                 </MyCardLastOne>
                 <MyCardLastTwo>
-                  <h4>{moment(mh.date + mh.duration * 1000).fromNow()}</h4>
-                  <h4>{moment.utc(mh.duration * 1000).format('m:ss')} mins</h4>
+                  <h4>
+                    <img
+                      style={{ verticalAlign: 'top' }}
+                      src="https://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/spells.png"
+                      alt=""
+                    />
+                    {moment(mh.date + mh.duration * 1000).fromNow()}
+                  </h4>
+                  <h4>
+                    <img
+                      style={{ verticalAlign: 'middle' }}
+                      src="http://raw.communitydragon.org/10.3/game/data/images/ui/floatingcombattext/goldicon.png"
+                      alt=""
+                    />
+                    {'  '}
+                    {moment.utc(mh.duration * 1000).format('m:ss')} mins
+                  </h4>
                 </MyCardLastTwo>
               </MyCardLast>
             </CardKarada>
@@ -284,16 +397,16 @@ export default () => {
                 </h5>
                 <Row>
                   <Col sm="12" md="12" lg="12">
-                    <ItemImg src={it1} />
-                    <ItemImg src={it2} />
-                    <ItemImg src={it3} />
+                    <ItemImg src={it1} onError={e => errorSrc(e)} />
+                    <ItemImg src={it2} onError={e => errorSrc(e)} />
+                    <ItemImg src={it3} onError={e => errorSrc(e)} />
                   </Col>
                 </Row>
                 <Row>
                   <Col sm="12" md="12" lg="12">
-                    <ItemImg src={it4} />
-                    <ItemImg src={it5} />
-                    <ItemImg src={it6} />
+                    <ItemImg src={it4} onError={e => errorSrc(e)} />
+                    <ItemImg src={it5} onError={e => errorSrc(e)} />
+                    <ItemImg src={it6} onError={e => errorSrc(e)} />
                   </Col>
                 </Row>
               </div>
@@ -308,23 +421,45 @@ export default () => {
     const obj = champs.find(x => x.key === element.champid.toString())
     const newobj = { ...element, ...obj }
     const socc = newobj.champP
-    const imgs = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${newobj.id}_2.jpg`
+    // const imgs = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${newobj.id}_2.jpg`
+    const imgp = `https://ddragon.leagueoflegends.com/cdn/10.3.1/img/champion/${newobj.id}.png`
     const succ =
       Math.abs(socc) > 999
         ? Math.sign(socc) * (Math.abs(socc) / 1000).toFixed(1) + 'k'
         : Math.sign(socc) * Math.abs(socc)
     return (
-      <Cardu key={newobj.key}>
-        <img src={imgs} alt="" srcset="" />
-        <Cheader className="Cheader">{newobj.id}</Cheader>
-        <CardBody className="Cbody">
-          <CardTitle className="Ctitle">{newobj.title}</CardTitle>
-          <h2> Mastery {newobj.lvl}</h2>
-          <CardFooter className="cbot">
-            <span>{succ}</span> Mastery Points
-          </CardFooter>
-        </CardBody>
-      </Cardu>
+      <div key={newobj.key} className="wrapper">
+        <div className="profile-card js-profile-card">
+          <div className="profile-card__img">
+            <img src={imgp} alt="profile card" />
+          </div>
+          <div className="profile-card__cnt js-profile-cnt">
+            <div className="profile-card__name">{newobj.id}</div>
+            <div className="profile-card-loc">{newobj.title}</div>
+            <div className="profile-card-inf">
+              <div className="profile-card-inf__item1">
+                <div className="profile-card-inf__title">Mastery</div>
+                <div className="profile-card-inf__txt">{newobj.lvl}</div>
+              </div>
+              <div
+                className="profile-card-inf__item"
+                style={{ width: '50%  ' }}
+              >
+                <div className="profile-card-inf__title">
+                  <img
+                    src={require(`../../assets/mastery/${newobj.lvl}.png`)}
+                    alt=""
+                  />
+                </div>
+              </div>
+              <div className="profile-card-inf__item2">
+                <div className="profile-card-inf__title">MPoints</div>
+                <div className="profile-card-inf__txt">{succ}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   })
 
@@ -332,65 +467,57 @@ export default () => {
     <Loading />
   ) : (
     <FadeIn>
-      <Bggg
-        src="https://images3.alphacoders.com/102/1029326.jpg"
-        alt="bg"
-        class="bg"
-      ></Bggg>
+      <PBackground src={pBg} alt="" className="bg"></PBackground>
       <Containerr fluid>
-        <Row style={{ marginBottom: '7vh' }}>
-          <Col sm="12" md="12" lg="12">
+        <MyRow>
+          <MyCol1 sm="12" md="12" lg="12">
             <Slider {...settings}>
-              <div class="wrapper">
-                <div class="profile-card js-profile-card">
-                  <div class="profile-card__img">
+              <div className="wrapper">
+                <div className="profile-card js-profile-card">
+                  <div className="profile-card__img">
                     <img
                       src={`http://ddragon.leagueoflegends.com/cdn/10.2.1/img/profileicon/${state.SummonerData.playerData.profileIconId}.png`}
-                      alt="profile card"
+                      alt="profile"
                     />
                   </div>
-
-                  <div class="profile-card__cnt js-profile-cnt">
-                    <div class="profile-card__name">
+                  <div className="profile-card__cnt js-profile-cnt">
+                    <div className="profile-card__name">
                       {state.SummonerData.playerData.name}
                     </div>
-                    <div class="profile-card__txt">
+                    <div className="profile-card__txt">
                       Lvl {state.SummonerData.playerData.summonerLevel}
                     </div>
-                    <div class="profile-card-loc">
+                    <div className="profile-card-loc">
                       {rank[sRank] ? rank[sRank].qType : 'Unranked'}
                     </div>
-
-                    <div class="profile-card-inf">
-                      <div class="profile-card-inf__item1">
-                        <div class="profile-card-inf__title">
+                    <div className="profile-card-inf">
+                      <div className="profile-card-inf__item1">
+                        <div className="profile-card-inf__title">
                           {rank[sRank]
                             ? rank[sRank].tier + ' ' + rank[sRank].rank
                             : ''}
                         </div>
-                        <div class="profile-card-inf__txt">
+                        <div className="profile-card-inf__txt">
                           {rank[sRank] ? rank[sRank].lp + ' LP' : ''}
                         </div>
                       </div>
-
                       <div
-                        class="profile-card-inf__item"
+                        className="profile-card-inf__item"
                         style={{ width: '50%  ' }}
                       >
-                        <div class="profile-card-inf__title">
+                        <div className="profile-card-inf__title">
                           <img
                             src={
                               rank[sRank]
                                 ? require(`../../assets/rankedLogos/${rank[sRank].tier}.png`)
                                 : require(`../../assets/rankedLogos/UNRANKED.png`)
                             }
-                            alt=""
+                            alt="rank"
                           />
                         </div>
                       </div>
-
-                      <div class="profile-card-inf__item2">
-                        <div class="profile-card-inf__title">
+                      <div className="profile-card-inf__item2">
+                        <div className="profile-card-inf__title">
                           {rank[sRank]
                             ? rank[sRank].wins +
                               'W | ' +
@@ -398,23 +525,17 @@ export default () => {
                               'L'
                             : ''}
                         </div>
-                        <div class="profile-card-inf__txt">
+                        <div className="profile-card-inf__txt">
                           {rank[sRank]
                             ? `${Math.round(rank[sRank].wr)}% WR`
                             : ''}
                         </div>
                       </div>
                     </div>
-
-                    {/* <div class="profile-card-social">///</div> */}
-
-                    <div class="profile-card-ctr">
-                      {/* <button class="profile-card__button button--blue js-message-btn">
-                        Message
-                      </button> */}
+                    <div className="profile-card-ctr">
                       <button
                         onClick={() => switchRank()}
-                        class="profile-card__button button--blue"
+                        className="profile-card__button button--blue"
                       >
                         Switch Rank
                       </button>
@@ -422,32 +543,63 @@ export default () => {
                   </div>
                 </div>
               </div>
-              <div class="wrapper1">
-                <div class="profile-card1">
-                  <Slider {...settings}>
+              <MyRow>
+                <Col
+                  sm="12"
+                  md="12"
+                  lg="12"
+                  style={{
+                    marginLeft: '0',
+                    marginRight: '0',
+                    paddingLeft: '0',
+                    paddingRight: '0'
+                  }}
+                >
+                  <Slider ref={inputEl} {...settings1}>
                     {mainChampsRender}
-                    <ButtonC onClick={() => addMore()}>Load More</ButtonC>
                   </Slider>
-                </div>
-              </div>
+                </Col>
+                <Row>
+                  <MyCol sm="12" md="4" lg="4">
+                    <button
+                      onClick={() => previous()}
+                      className="profile-card__button button--blue sec"
+                    >
+                      Previous
+                    </button>
+                  </MyCol>
+                  <MyCol sm="12" md="4" lg="4">
+                    {miniLoad2 ? (
+                      <SemipolarLoading
+                        style={{ position: 'relative', marginTop: '20px' }}
+                        color="white"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => addMore()}
+                        className="profile-card__button button--gray sec"
+                      >
+                        Load More
+                      </button>
+                    )}
+                  </MyCol>
+                  <MyCol sm="12" md="4" lg="4">
+                    <button
+                      onClick={() => next()}
+                      className="profile-card__button button--blue sec"
+                    >
+                      Next
+                    </button>
+                  </MyCol>
+                </Row>
+              </MyRow>
             </Slider>
-          </Col>
-        </Row>
-        {/* <Row>
-          <Col sm="12" md="12" lg="12">
-            <ButtonL onClick={e => moreChampsu(e)}>
-              <span class="top">Load More</span>
-              <span class="bottom">˅</span>
-            </ButtonL>
-          </Col>
-        </Row> */}
-        <Row
-          style={{
-            borderRadius: '20px',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
-          }}
-        >
-          {matchesRender}
+          </MyCol1>
+        </MyRow>
+        <Row>
+          <div className="wrapper1">
+            <div className="profile-card1">{matchesRender}</div>
+          </div>
         </Row>
         <Row
           style={{
@@ -463,8 +615,8 @@ export default () => {
             />
           ) : (
             <ButtonL onClick={e => moreChampsu(e)}>
-              <span class="top">Load More</span>
-              <span class="bottom">˅</span>
+              <span className="top">Load More</span>
+              <span className="bottom">˅</span>
             </ButtonL>
           )}
         </Row>
@@ -473,12 +625,7 @@ export default () => {
   )
 }
 
-const Cimg = styled.img`
-  height: 330px;
-  width: 300px;
-`
-
-const Bggg = styled.img`
+const PBackground = styled.img`
   min-height: 100%;
   min-width: 1024px;
   width: 100%;
@@ -486,60 +633,31 @@ const Bggg = styled.img`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: -1;
+  @media screen and (max-width: 1024px) {
+    left: 50%;
+    margin-left: -512px;
+  }
 `
 const ItemImg = styled.img`
   width: 17%;
+  border: 2px black solid;
 `
-
-const H1 = styled.h1`
-  text-align: left;
-  color: white;
-  letter-spacing: 2px;
+const MyCol = styled(Col)`
+  margin-right: 0;
+  margin-left: 0;
+  padding-right: 0px;
+  padding-left: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
-const MyH1 = styled.h1`
-  text-transform: uppercase;
-  text-align: center;
-  width: 100%;
-  color: white;
-  font-family: 'Roboto Condensed', sans-serif;
-`
-const Lvl = styled.h4`
-  text-align: left;
-  color: white;
-  letter-spacing: 2px;
-`
-
-const Pfp = styled.img`
-  width: 100%;
-  max-width: 170px;
-  height: auto;
-`
-
-const Rp = styled.img`
-  width: 100%;
-  max-width: 190px;
-  @media only screen and (max-width: 600px) {
-    width: 100%;
+const MyCol1 = styled(Col)`
+  @media screen and (max-width: 600px) {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 `
-
-const H4 = styled.h4`
-  color: white;
-  text-align: left;
-  font-size: 1.25rem;
-`
-
-const H5 = styled.h5`
-  text-align: left;
-  color: white;
-
-  @media only screen and (max-width: 600px) {
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-    margin-top: 0;
-    width: 100%;
-    text-align: center;
-  }
+const MyRow = styled(Row)`
+  margin-right: 0;
+  margin-left: 0;
 `

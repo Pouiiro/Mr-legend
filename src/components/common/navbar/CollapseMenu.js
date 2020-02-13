@@ -32,8 +32,8 @@ const CollapseMenu = ({ navbarState, handleNavbar }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink activeStyle={styleAc} to="/ranking" exact>
-              Ranking
+            <NavLink activeStyle={styleAc} to="/profile" exact>
+              Profile
             </NavLink>
           </li>
           <li>

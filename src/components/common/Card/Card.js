@@ -15,18 +15,29 @@ export const MyCard = styled.div`
   margin-right: auto;
   margin-bottom: 5vh;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  border-radius: 2px;
+  border-radius: 12px;
   transition: 0.4s ease-out;
-
   cursor: pointer;
   :hover {
     transform: translateY(-20px);
+  }
+  @media screen and (max-width: 600px) {
+    :hover {
+      transform: translateY(0px);
+    }
   }
 `
 export const CardKarada = styled.div`
   flex-wrap: nowrap;
   flex-direction: column;
   display: flex;
+  text-align: center;
+  font-family: 'Poppins';
+  color: lightcyan;
+  h6 {
+    font-size: 20px;
+    color: lightskyblue;
+  }
 `
 
 export const MyCardImg = styled.img`
@@ -65,11 +76,10 @@ export const MyCardLastOne = styled.div`
 export const MyCardLastTwo = styled.div`
   width: 50%;
   margin-top: 1rem;
-
   h4 {
     text-align: right;
     font-size: 17px;
-    margin-right: 0.5rem;
+    margin-right: 1rem;
   }
 `
 
