@@ -1,56 +1,41 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
-import { Parallax } from 'react-parallax'
+import React, { useContext } from 'react'
+import { ParallaxLayer } from 'react-spring/renderprops-addons'
 import { MrLegendContext } from 'providers/AppProvider'
-import {
-  Div,
-  Div1,
-  Title,
-  Img,
-  Input,
-  ButtonD,
-  ButtonS,
-  Img1
-} from 'global/styles'
-import gnr from 'assets/images/input.png'
+import { Img, Input, ButtonD, ButtonS } from 'global/styles'
 import logo from 'assets/images/cover3.png'
-import bg1 from 'assets/images/bg1.jpg'
 
 const Intro = () => {
-  const { user, setUser } = useContext(MrLegendContext)
+  const { setUser } = useContext(MrLegendContext)
   let summoner = ''
-  const inputUser = () => {
-    setUser({ ...user, currentUser: summoner })
+  const style = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItem: 'center',
+    flexdirection: 'column',
+    flexWrap: 'nowrap'
   }
   return (
-    <Parallax bgImage={bg1} strength={500}>
-      <Div style={{ height: '720px' }}>
-        <Div1>
-          <Title>
-            <Img src={logo} />
-          </Title>
-          <Input
-            onChange={e => {
-              user = e.target.value
-            }}
-            type="text"
-            placeholder="SUMMONER NAME"
-          />
-          <ButtonD>
-            <ButtonS
-              onClick={e => {
-                e.preventDefault()
-                inputUser()
-              }}
-              className="btn btn-white btn-				 animate"
-              href=""
-            >
-              Let's Go
-            </ButtonS>
-          </ButtonD>
-          <Img1 src={gnr} />
-        </Div1>
-      </Div>
-    </Parallax>
+    <>
+      <ParallaxLayer factor={0.1} offset={0.3} speed={1} style={style}>
+        <Img src={logo} />
+      </ParallaxLayer>
+      <ParallaxLayer factor={0.1} offset={0.45} speed={2} style={style}>
+        <Input
+          onChange={e => {
+            summoner = e.target.value
+          }}
+          type="text"
+          placeholder="SUMMONER NAME"
+        />
+      </ParallaxLayer>
+      <ParallaxLayer factor={0.1} offset={0.55} speed={-2} style={style}>
+        <ButtonD onClick={() => setUser(summoner)}>
+          <ButtonS to="/profile" className="btn btn-white btn-				 animate">
+            Let's Go
+          </ButtonS>
+        </ButtonD>
+      </ParallaxLayer>
+    </>
   )
 }
 

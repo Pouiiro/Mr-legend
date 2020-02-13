@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useSpring, animated, config } from 'react-spring'
 import { NavLink } from 'react-router-dom'
@@ -27,7 +27,6 @@ export const useScrollHandler = () => {
 const Navbar = () => {
   const scroll = useScrollHandler()
   const [nav, setNav] = useState(false)
-
   const owo = () => {
     setNav(!nav)
   }
@@ -44,7 +43,7 @@ const Navbar = () => {
           from: { transform: 'translate3d(0, -10rem, 0)' },
           transform: 'translate3d(0, 0, 0)',
           backgroundColor: 'white',
-          transition: '0.1s ease in'
+          transition: '0.5s ease out'
         }
   )
 
@@ -54,7 +53,7 @@ const Navbar = () => {
     delay: 800,
     config: config.wobbly
   })
-  const styleAc = { color: '#380089' }
+  const styleAc = { color: '#8e16ff' }
 
   return (
     <>
@@ -68,9 +67,9 @@ const Navbar = () => {
             <NavLink activeStyle={styleAc} to="/profile" exact>
               Profile
             </NavLink>
-            <NavLink activeStyle={styleAc} to="/ranking" exact>
+            {/* <NavLink activeStyle={styleAc} disabled to="/ranking" exact>
               Ranking
-            </NavLink>
+            </NavLink> */}
             <Span />
             <NavLink activeStyle={styleAc} to="/about" exact>
               About
